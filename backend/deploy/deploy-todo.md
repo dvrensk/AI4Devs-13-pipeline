@@ -39,18 +39,18 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
   ```bash
   sudo apt update && sudo apt upgrade -y
   ```
-- [ ] Install Docker
+- [x] Install Docker
   ```bash
   sudo apt install docker.io docker-compose -y
   sudo usermod -aG docker ubuntu
   ```
-- [ ] Install Git
+- [x] Install Git
   ```bash
   sudo apt install git -y
   ```
 
 ### Directory Structure
-- [ ] Create application directory
+- [x] Create application directory
   ```bash
   mkdir -p /home/ubuntu/ai4devs
   cd /home/ubuntu/ai4devs
@@ -59,15 +59,14 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
 ## 3. Application Setup
 
 ### RDS Configuration
-- [ ] Configure RDS security group
+- [x] Configure RDS security group
   - Allow inbound PostgreSQL (port 5432) from EC2 security group
   - Note the RDS endpoint: backend-1.chgeoqqmsntl.eu-north-1.rds.amazonaws.com
-- [ ] Set up database user and password
+- [x] Set up database user and password
 - [ ] Create database schema
   ```bash
   npx prisma db push
   ```
-- [ ] Test database connection
 
 ### Docker Configuration
 - [ ] Create docker-compose.yml (without local database)
