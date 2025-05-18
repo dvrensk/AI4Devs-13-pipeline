@@ -9,14 +9,11 @@
     - SSH (port 22)
     - HTTP (port 80)
     - HTTPS (port 443)
-  - Create and download key pair
+  - Use existing key pair
   - Note the public IP address
 
 ### Domain Setup
-- [ ] Register domain name (if not already done)
-- [ ] Create Route 53 hosted zone
 - [ ] Add A record pointing to EC2 instance
-- [ ] Add CNAME record for www subdomain
 - [ ] Wait for DNS propagation (can take up to 48 hours)
 
 ## 2. Server Preparation
@@ -24,7 +21,7 @@
 ### Initial Setup
 - [ ] SSH into the server
   ```bash
-  ssh -i your-key.pem ubuntu@your-server-ip
+  ssh ubuntu@your-server-ip
   ```
 - [ ] Update system
   ```bash
@@ -171,113 +168,13 @@
 
 ## Required Files
 
-### docker-compose.yml
-```yaml
-version: '3'
-services:
-  app:
-    build: .
-    environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/ai4devs
-      - NODE_ENV=production
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`yourdomain.com`)"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls=true"
-
-  db:
-    image: postgres:14
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=ai4devs
-
-  traefik:
-    image: traefik:v2.5
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - traefik_data:/etc/traefik
-    command:
-      - "--providers.docker=true"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=your@email.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/etc/traefik/acme.json"
-
-volumes:
-  postgres_data:
-  traefik_data:
-```
-
-### Dockerfile
-```dockerfile
-FROM node:18-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
-
-COPY . .
-RUN npm run build
-
-EXPOSE 3000
-
-CMD ["npm", "start"]
-```
-
-### .env
-```env
-DATABASE_URL=postgresql://user:password@db:5432/ai4devs
-NODE_ENV=production
-JWT_SECRET=your-secret-key
-```
+* docker-compose.yml
+* Dockerfile
+* .env (see: dotenv)
 
 ### GitHub Actions Workflow
-```yaml
-name: CI/CD
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '18'
-      - run: npm ci
-      - run: npm test
-
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Deploy to AWS
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.AWS_HOST }}
-          username: ${{ secrets.AWS_USER }}
-          key: ${{ secrets.AWS_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/ai4devs
-            git pull
-            docker-compose down
-            docker-compose up -d --build
-```
+See [github-action-sketch.yml]()
 
 ## Notes
 - Keep all sensitive information in environment variables
