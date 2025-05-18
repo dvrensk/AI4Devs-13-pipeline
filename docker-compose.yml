@@ -1,12 +1,13 @@
 version: "3.1"
 
+# Only to be used in development & testing
 services:
   db:
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: D1ymf8wyQEGthFR1E9xhCq
+      POSTGRES_USER: LTIdbUser
+      POSTGRES_DB: LTIdb
     ports:
-      - ${DB_PORT}:5432
+      - 5432:5432
