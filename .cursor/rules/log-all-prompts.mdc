@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Before processing a new prompt, append
+```
+## Prompt n
+
+<text of prompt>
+```
+to `/prompts/prompts-DAVR.md`.  Make `n` the next natural prompt number, starting from the beginning of the file.
