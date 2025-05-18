@@ -3,22 +3,13 @@ services:
   app:
     build: .
     environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/ai4devs
+      - DATABASE_URL=postgresql://user:password@backend-1.chgeoqqmsntl.eu-north-1.rds.amazonaws.com:5432/ai4devs
       - NODE_ENV=production
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=Host(`yourdomain.com`)"
       - "traefik.http.routers.app.entrypoints=websecure"
       - "traefik.http.routers.app.tls=true"
-
-  db:
-    image: postgres:14
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=ai4devs
 
   traefik:
     image: traefik:v2.5
@@ -36,5 +27,4 @@ services:
       - "--certificatesresolvers.myresolver.acme.storage=/etc/traefik/acme.json"
 
 volumes:
-  postgres_data:
   traefik_data:

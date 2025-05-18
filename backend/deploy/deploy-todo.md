@@ -3,27 +3,39 @@
 ## 1. AWS Setup
 
 ### EC2 Instance
-- [ ] Create an EC2 instance (t2.micro or t3.micro for testing)
-  - Ubuntu Server 22.04 LTS
+- [x] Create an EC2 instance (t2.micro or t3.micro for testing)
+  - Ubuntu Server 24.04 LTS
   - Configure security group:
     - SSH (port 22)
     - HTTP (port 80)
     - HTTPS (port 443)
   - Use existing key pair
-  - Note the public IP address
+  - Note the public IP address (13.60.57.150)
+
+### RDS Setup
+- [x] Verify RDS instance is running
+  - Endpoint: backend-1.chgeoqqmsntl.eu-north-1.rds.amazonaws.com
+  - Region: eu-north-1
+- [x] Configure RDS security group
+  - Allow inbound PostgreSQL (port 5432) from EC2 security group
+- [x] Note database credentials
+- [x] Test database connection
 
 ### Domain Setup
-- [ ] Add A record pointing to EC2 instance
-- [ ] Wait for DNS propagation (can take up to 48 hours)
+
+The domain backend.ai4devs.valevalevale.es will be used for the backend.
+
+- [x] Add A record pointing to EC2 instance
+- [x] Wait for DNS propagation (can take up to 48 hours)
 
 ## 2. Server Preparation
 
 ### Initial Setup
-- [ ] SSH into the server
+- [x] SSH into the server
   ```bash
-  ssh ubuntu@your-server-ip
+  ssh ubuntu@backend.ai4devs.valevalevale.es
   ```
-- [ ] Update system
+- [x] Update system
   ```bash
   sudo apt update && sudo apt upgrade -y
   ```
@@ -46,10 +58,21 @@
 
 ## 3. Application Setup
 
+### RDS Configuration
+- [ ] Configure RDS security group
+  - Allow inbound PostgreSQL (port 5432) from EC2 security group
+  - Note the RDS endpoint: backend-1.chgeoqqmsntl.eu-north-1.rds.amazonaws.com
+- [ ] Set up database user and password
+- [ ] Create database schema
+  ```bash
+  npx prisma db push
+  ```
+- [ ] Test database connection
+
 ### Docker Configuration
-- [ ] Create docker-compose.yml
+- [ ] Create docker-compose.yml (without local database)
 - [ ] Create Dockerfile
-- [ ] Create .env file for environment variables
+- [ ] Create .env file with RDS connection string
 - [ ] Create traefik configuration
 - [ ] Set up Docker volumes for persistence
 
@@ -99,16 +122,17 @@
   - [ ] Container health checks
   - [ ] Application logs
   - [ ] SSL certificate expiration monitoring
+  - [ ] RDS performance monitoring
 
 ## 6. Backup Strategy
 
 ### Database Backup
-- [ ] Set up automated PostgreSQL backups
-- [ ] Configure backup retention policy
+- [ ] Configure RDS automated backups
+- [ ] Set up backup retention policy
 - [ ] Test backup and restore process
+- [ ] Document RDS backup procedures
 
 ### Configuration Backup
-- [ ] Backup Docker volumes
 - [ ] Backup environment files
 - [ ] Document backup process
 
@@ -133,6 +157,7 @@
 - [ ] Review and secure environment variables
 - [ ] Configure rate limiting
 - [ ] Set up security headers
+- [ ] Secure RDS connection
 
 ## 8. Maintenance Tasks
 
@@ -140,11 +165,13 @@
 - [ ] Set up log rotation
 - [ ] Configure system updates
 - [ ] Set up monitoring alerts
+- [ ] Monitor RDS performance
 
 ### Documentation
 - [ ] Document deployment process
 - [ ] Create runbook for common issues
 - [ ] Document backup and restore procedures
+- [ ] Document RDS maintenance procedures
 
 ## 9. Testing
 
@@ -153,11 +180,13 @@
 - [ ] Verify SSL certificate
 - [ ] Test database connections
 - [ ] Verify backup process
+- [ ] Test RDS failover (if configured)
 
 ### Load Testing
 - [ ] Basic load testing
 - [ ] Verify resource usage
 - [ ] Check response times
+- [ ] Monitor RDS performance under load
 
 ## 10. Cost Optimization
 
@@ -165,6 +194,7 @@
 - [ ] Set up AWS Budget alerts
 - [ ] Configure instance scheduling (if needed)
 - [ ] Review and optimize resource usage
+- [ ] Monitor RDS costs
 
 ## Required Files
 
@@ -184,3 +214,6 @@ See [github-action-sketch.yml]()
 - Document all custom configurations
 - Regular backup testing
 - Keep deployment documentation up to date
+- Monitor RDS performance and costs
+- Ensure RDS security group is properly configured
+- Consider using AWS Secrets Manager for database credentials

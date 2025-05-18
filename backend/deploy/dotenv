@@ -1,3 +1,3 @@
-DATABASE_URL=postgresql://user:password@db:5432/ai4devs
+DATABASE_URL=postgresql://user:password@backend-1.chgeoqqmsntl.eu-north-1.rds.amazonaws.com:5432/ai4devs
 NODE_ENV=production
 JWT_SECRET=your-secret-key
