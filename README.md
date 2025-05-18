@@ -122,7 +122,7 @@ Para generar la base de datos utilizando Prisma, sigue estos pasos:
 3. Ejecuta los siguientes comandos para generar la estructura de prisma, las migraciones a tu base de datos y poblarla con datos de ejemplo:
 ```
 npx prisma generate
-npx prisma migrate dev
+npm run prisma:migrate:dev
 ts-node seed.ts
 ```
 

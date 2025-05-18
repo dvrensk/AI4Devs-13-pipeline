@@ -6,6 +6,16 @@ import candidateRoutes from './routes/candidateRoutes';
 import positionRoutes from './routes/positionRoutes';
 import { uploadFile } from './application/services/fileUploadService';
 import cors from 'cors';
+import path from 'path';
+
+// Load environment variables based on NODE_ENV
+const envFile = process.env.NODE_ENV === 'production' 
+  ? '.env.production' 
+  : process.env.NODE_ENV === 'test' 
+    ? '.env.test' 
+    : '.env.development';
+
+dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 
 // Extender la interfaz Request para incluir prisma
 declare global {
@@ -16,7 +26,6 @@ declare global {
   }
 }
 
-dotenv.config();
 const prisma = new PrismaClient();
 
 export const app = express();
@@ -31,9 +40,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware para permitir CORS desde http://localhost:3000
+// Middleware para permitir CORS
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true
 }));
 
@@ -51,7 +60,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const port = 3010;
+const port = process.env.PORT || 3010;
 
 app.get('/', (req, res) => {
   res.send('Hola LTI!');

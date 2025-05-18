@@ -1,3 +1,9 @@
-DATABASE_URL=postgresql://user:password@backend-1.chgeoqqmsntl.eu-north-1.rds.amazonaws.com:5432/ai4devs
+# Server Configuration
+PORT=3010
 NODE_ENV=production
-JWT_SECRET=your-secret-key
+
+# Database Configuration
+DATABASE_URL="postgresql://postgres:PASSWORD_GOES_HERE@backend-1.chgeoqqmsntl.eu-north-1.rds.amazonaws.com:5432/lti_ats"
+
+# CORS Configuration
+CORS_ORIGIN="https://your-production-domain.com"
