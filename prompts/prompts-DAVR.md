@@ -160,3 +160,29 @@ May 19 09:03:28 ip-172-31-38-161 systemd[1]: Started traefik.service - Traefik E
 
 ## Prompt 26
 
+I'm about to start the app on the server.  If I run `pm2 start dist/index.js --name ai4devs-backend` how will it know to use NODE_ENV=production?
+
+## Prompt 27
+
+What if I add the variable to .bashrc? Or some other file like .profile?
+
+## Prompt 28
+
+I'm pretty sure setting RAILS_ENV=production in one of the dotfiles is what we've always been doing in the rails world. IIRC pm2 will be restarted by systemd if the machine reboots, right? Where does it pick up its environment?
+
+## Prompt 29
+
+Can you add this to the right section in the todo?
+
+## Prompt 30
+
+We still don't have the cert:
+...
+May 19 09:04:49 ip-172-31-38-161 traefik[7113]: 2025-05-19T09:04:49Z INF Testing certificate renew... acmeCA=https://acme-v02.api.letsencrypt.or>
+
+## Prompt 31
+
+The domain resolves, port 80 is open and redirects to 443 as expected. This is the debug output BEFORE disabling the challenge: [...]
+
+## Prompt 32
+

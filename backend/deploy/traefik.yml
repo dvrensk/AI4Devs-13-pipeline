@@ -7,11 +7,6 @@ global:
 entryPoints:
   web:
     address: "0.0.0.0:80"
-    http:
-      redirections:
-        entryPoint:
-          to: websecure
-          scheme: https
 
   websecure:
     address: "0.0.0.0:443"
@@ -43,6 +38,23 @@ accessLog:
 # HTTP configuration
 http:
   routers:
+    # Add explicit redirect for non-ACME paths
+    web-to-websecure:
+      rule: "Host(`backend.ai4devs.valevalevale.es`) && !PathPrefix(`/.well-known/acme-challenge/`)"
+      entryPoints:
+        - web
+      middlewares:
+        - redirect-to-https
+      service: noop@internal
+
+    # Keep the ACME challenge router
+    acme-http:
+      rule: "PathPrefix(`/.well-known/acme-challenge/`)"
+      entryPoints:
+        - web
+      service: acme-http@internal
+
+    # Your API router
     api:
       rule: "Host(`backend.ai4devs.valevalevale.es`)"
       service: "api"
@@ -50,6 +62,12 @@ http:
         - websecure
       tls:
         certResolver: letsencrypt
+
+  middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
 
   services:
     api:
