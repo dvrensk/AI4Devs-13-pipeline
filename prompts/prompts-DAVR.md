@@ -51,3 +51,76 @@ nope, still doesn't work
 
 ## Prompt 11
 
+@deploy What is the next step?
+
+## Prompt 12
+
+I think we might have had a misunderstanding earlier. I talked about running the app with Docker, but what I meant was using Docker for nodejs etc, much like one would do in development. It seems like you took it to mean that I'd create a docker image in CI. Is that right?
+
+## Prompt 13
+
+Since we're only going to run this on one server now we can keep it simple. Can you rebuild the @deploy-todo.md assuming that we won't use docker, but instead install nodejs and traefik as ubuntu packages?
+For the deploy I'm thinking something like Capistrano would do. Do you need a pointer or do you know what I mean?
+
+## Prompt 14
+
+I followed the instructions and installed nvm and node as user ubuntu.  But the next step is to install pm2 as root, and that fails since root doesn't have node.
+I prefer to stay in userland and run pm2 as ubuntu. Is that compatible with best practice?
+
+## Prompt 15
+
+`save` complains:
+ubuntu@ip-172-31-38-161:~$ pm2 save
+[PM2] Spawning PM2 daemon with pm2_home=/home/ubuntu/.pm2
+[PM2] PM2 Successfully daemonized
+[PM2] Saving current process list...
+[PM2][WARN] PM2 is not managing any process, skipping save...
+[PM2][WARN] To force saving use: pm2 save --force
+
+## Prompt 16
+
+$ sudo apt install -y traefik
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+E: Unable to locate package traefik
+
+_Add some back-and-forth and now we install it through a tarball as befits a golang project._
+
+## Prompt 17
+
+How do I configure traefik?
+
+## Prompt 18
+
+Do we really want files in `/etc` to be owned by ubuntu?  Why?
+
+## Prompt 19
+
+Traefik will bind to ports 80 and 443, right? Doesn't it need to run as root? Or does it drop down to something else? If so, does it have to be to ubuntu?
+
+## Prompt 20
+
+$ sudo systemctl status traefik | cat
+● traefik.service - Traefik Edge Router
+     Loaded: loaded (/etc/systemd/system/traefik.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2025-05-19 08:41:37 UTC; 55s ago
+       Docs: https://docs.traefik.io
+   Main PID: 6369 (traefik)
+      Tasks: 8 (limit: 1077)
+     Memory: 25.7M (peak: 26.0M)
+        CPU: 263ms
+     CGroup: /system.slice/traefik.service
+             └─6369 /usr/local/bin/traefik --configfile=/etc/traefik/traefik.yml
+
+May 19 08:41:37 ip-172-31-38-161 traefik[6369]: Help us improve Traefik by turning this feature on :)
+May 19 08:41:37 ip-172-31-38-161 traefik[6369]: More details on: https://doc.traefik.io/traefik/contributing/data-collection/
+May 19 08:41:37 ip-172-31-38-161 traefik[6369]: 
+May 19 08:41:37 ip-172-31-38-161 traefik[6369]: 2025-05-19T08:41:37Z ERR The ACME resolve is skipped from the resolvers list error="unable to get ACME account: permissions 640 for /etc/traefik/acme.json are too open, please use 600" resolver=letsencrypt
+
+## Prompt 21
+
+Yes, explain how traefik can write to that file given this service defnition
+
+## Prompt 22
+

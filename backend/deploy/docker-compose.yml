@@ -7,7 +7,7 @@ services:
       - NODE_ENV=production
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`yourdomain.com`)"
+      - "traefik.http.routers.app.rule=Host(`backend.ai4devs.valevalevale.es`)"
       - "traefik.http.routers.app.entrypoints=websecure"
       - "traefik.http.routers.app.tls=true"
 
@@ -23,7 +23,7 @@ services:
       - "--providers.docker=true"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=your@email.com"
+      - "--certificatesresolvers.myresolver.acme.email=valevalevale@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/etc/traefik/acme.json"
 
 volumes:
