@@ -6,7 +6,7 @@ global:
 # Entrypoints configuration
 entryPoints:
   web:
-    address: ":80"
+    address: "0.0.0.0:80"
     http:
       redirections:
         entryPoint:
@@ -14,7 +14,7 @@ entryPoints:
           scheme: https
 
   websecure:
-    address: ":443"
+    address: "0.0.0.0:443"
 
 # Let's Encrypt configuration
 certificatesResolvers:
@@ -24,6 +24,7 @@ certificatesResolvers:
       storage: "/etc/traefik/acme.json"
       httpChallenge:
         entryPoint: web
+      preferredChain: "ISRG Root X1"  # Use Let's Encrypt's preferred chain
 
 # API and Dashboard configuration (optional, for monitoring)
 api:

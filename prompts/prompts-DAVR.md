@@ -124,3 +124,39 @@ Yes, explain how traefik can write to that file given this service defnition
 
 ## Prompt 22
 
+The logs show that it's trying to get a cert. How long should it take?
+```
+May 19 08:45:52 ip-172-31-38-161 traefik[6423]: 2025-05-19T08:45:52Z INF Testing certificate renew... acmeCA=https://acme-v02.api.letsencrypt.org/directory providerName=letsencrypt.acme
+```
+
+## Prompt 23
+
+It seems to only listen on ipv6:
+```
+sudo netstat -tulpn | grep :80
+tcp6       0      0 :::80                   :::*                    LISTEN      6423/traefik   
+```
+
+## Prompt 24
+
+Something has moved!
+```
+May 19 08:56:53 ip-172-31-38-161 traefik[6952]: 2025-05-19T08:56:53Z INF Testing certificate renew... acmeCA=https://acme-v02.api.letsencrypt.org/directory providerName=letsencrypt.acme
+May 19 08:56:53 ip-172-31-38-161 traefik[6952]: 2025-05-19T08:56:53Z INF Starting provider *acme.ChallengeTLSALPN
+May 19 08:59:04 ip-172-31-38-161 traefik[6952]: 2025-05-19T08:59:04Z ERR Unable to get token error="missing token" providerName=acme
+```
+
+## Prompt 25
+
+It didn't like that:
+```
+May 19 09:03:23 ip-172-31-38-161 systemd[1]: Started traefik.service - Traefik Edge Router.
+May 19 09:03:23 ip-172-31-38-161 traefik[6994]: {"level":"error","error":"command traefik error: field not found, node: entryPoint","time":"2025-05-19T09:03:23Z","message":"Command error"}
+May 19 09:03:23 ip-172-31-38-161 systemd[1]: traefik.service: Main process exited, code=exited, status=1/FAILURE
+May 19 09:03:23 ip-172-31-38-161 systemd[1]: traefik.service: Failed with result 'exit-code'.
+May 19 09:03:28 ip-172-31-38-161 systemd[1]: traefik.service: Scheduled restart job, restart counter is at 1.
+May 19 09:03:28 ip-172-31-38-161 systemd[1]: Started traefik.service - Traefik Edge Router.
+```
+
+## Prompt 26
+
