@@ -186,3 +186,77 @@ The domain resolves, port 80 is open and redirects to 443 as expected. This is t
 
 ## Prompt 32
 
+It's time to give up traefik. Help me uninstall the service. Once we're done with that we'll add nginx instead, starting with just port 80, no TLS.
+
+## Prompt 33
+
+Great! pls update the todo with instructions for installing nginx
+
+## Prompt 34
+
+Now set up the github action to deploy the app to the server on push. (We'll add a check for no failing tests later.)
+Before you start, describe what your plan is.
+
+## Prompt 35
+
+Please see here what I did to copy the shared files. Go ahead!
+
+## Prompt 36
+
+It failed. Last output was:
+```
+Cloning into '.'...
+bash: line 1: npm: command not found
+```
+My guess is that this is because we're using nvm and it's not properly set up to work with non-interactive sessions.  How do we fix?
+
+## Prompt 37
+
+Let's not over-complicate things. I just move the nvm stuff to the top of the .bashrc and now it finds npm. But it looks like `npm run build` fails now:
+```
+Cloning into '.'...
+added 132 packages, and audited 133 packages in 5s
+15 packages are looking for funding
+  run `npm fund` for details
+6 vulnerabilities (3 low, 3 high)
+To address all issues, run:
+  npm audit fix
+Run `npm audit` for details.
+> backend@1.0.0 build
+> tsc
+sh: 1: tsc: not found
+Error: Process completed with exit code 127.
+```
+Do you have any guess?
+
+## Prompt 38
+
+If that is required, why did it work when I did the first manual install?
+
+## Prompt 39
+
+I have access to the server and got this:
+```
+/var/www/ats_backend/releases/fda266ddc8cf73a46e7df8b91dd73924506b56d2/backend$ ls -l node_modules/.bin
+total 0
+lrwxrwxrwx 1 ubuntu ubuntu 25 May 19 12:21 js-yaml -> ../js-yaml/bin/js-yaml.js
+lrwxrwxrwx 1 ubuntu ubuntu 14 May 19 12:21 mime -> ../mime/cli.js
+lrwxrwxrwx 1 ubuntu ubuntu 20 May 19 12:21 mkdirp -> ../mkdirp/bin/cmd.js
+lrwxrwxrwx 1 ubuntu ubuntu 24 May 19 12:21 prisma -> ../prisma/build/index.js
+lrwxrwxrwx 1 ubuntu ubuntu 37 May 19 12:21 swagger-jsdoc -> ../swagger-jsdoc/bin/swagger-jsdoc.js
+lrwxrwxrwx 1 ubuntu ubuntu 24 May 19 12:21 z-schema -> ../z-schema/bin/z-schema
+```
+
+## Prompt 40
+
+I tried it, but it didn't run, since there was no change in the backend directory. Would it make sense to add the workflow directory to the triggers?
+
+## Prompt 41
+
+It works! Please add running the tests (npm test) as a prerequisite for deploying.
+
+what is this step doing in the deploy section?
+
+## Prompt 42
+
+What are the steps to add LetsEncrypt to nginx?  If it's not too much work I'd be willing to give it a try.

@@ -103,6 +103,72 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
   sudo systemctl status nginx
   ```
 
+- [x] Set up SSL with Let's Encrypt
+  ```bash
+  # Install Certbot and nginx plugin
+  sudo apt update
+  sudo apt install -y certbot python3-certbot-nginx
+
+  # Obtain and install certificate
+  sudo certbot --nginx -d backend.ai4devs.valevalevale.es
+  # Follow prompts:
+  # - Enter email for notifications
+  # - Agree to terms
+  # - Choose whether to share email with EFF
+  # - Choose whether to redirect HTTP to HTTPS (recommended: yes)
+
+  # Verify certificate installation
+  sudo certbot certificates
+
+  # Test automatic renewal
+  sudo certbot renew --dry-run
+
+  # Verify HTTPS is working
+  curl -vI https://backend.ai4devs.valevalevale.es/
+  ```
+
+  The Certbot will automatically modify the nginx configuration to look something like this:
+  ```nginx
+  server {
+      listen 80;
+      server_name backend.ai4devs.valevalevale.es;
+      # Redirect all HTTP traffic to HTTPS
+      return 301 https://$host$request_uri;
+  }
+
+  server {
+      listen 443 ssl;
+      server_name backend.ai4devs.valevalevale.es;
+
+      # SSL configuration (automatically added by Certbot)
+      ssl_certificate /etc/letsencrypt/live/backend.ai4devs.valevalevale.es/fullchain.pem;
+      ssl_certificate_key /etc/letsencrypt/live/backend.ai4devs.valevalevale.es/privkey.pem;
+      include /etc/letsencrypt/options-ssl-nginx.conf;
+      ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+      location / {
+          proxy_pass http://localhost:3010;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection 'upgrade';
+          proxy_set_header Host $host;
+          proxy_cache_bypass $http_upgrade;
+
+          # Additional security headers
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+      }
+  }
+  ```
+
+  Notes:
+  - Certificates auto-renew every 90 days
+  - Renewal is handled by a systemd timer
+  - Certbot adds secure SSL configuration automatically
+  - HTTP traffic is redirected to HTTPS
+  - The configuration includes modern SSL settings and security headers
+
 ### Directory Structure
 - [x] Create application directory structure
   ```bash
