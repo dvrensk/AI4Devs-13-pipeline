@@ -67,23 +67,40 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
   # Setup PM2 to start on system boot
   pm2 startup ubuntu
   ```
-- [x] Install Traefik
+- [x] Install and configure nginx
   ```bash
-  # Download the latest version (adjust version number as needed)
-  curl -LO https://github.com/traefik/traefik/releases/download/v3.4.0/traefik_v3.4.0_linux_amd64.tar.gz
+  # Install nginx
+  sudo apt update
+  sudo apt install -y nginx
 
-  # Verify the download (compare with checksums from the release page)
-  sha256sum traefik_v3.4.0_linux_amd64.tar.gz
+  # Create nginx configuration
+  sudo tee /etc/nginx/sites-available/backend.ai4devs.valevalevale.es << EOF
+  server {
+      listen 80;
+      server_name backend.ai4devs.valevalevale.es;
 
-  # Extract the binary to a system location
-  sudo tar -zxvf traefik_v3.4.0_linux_amd64.tar.gz -C /usr/local/bin
+      location / {
+          proxy_pass http://localhost:3010;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade \$http_upgrade;
+          proxy_set_header Connection 'upgrade';
+          proxy_set_header Host \$host;
+          proxy_cache_bypass \$http_upgrade;
+      }
+  }
+  EOF
 
-  # Allow the binary to bind to privileged ports
-  sudo setcap 'cap_net_bind_service=+ep' /usr/local/bin/traefik
-
-  # Verify the installation and capabilities
-  traefik version
-  getcap /usr/local/bin/traefik  # Should show cap_net_bind_service+ep
+  # Enable the site
+  (cd /etc/nginx/sites-enabled && sudo ln -s ../sites-available/backend.ai4devs.valevalevale.es)
+  
+  # Test configuration
+  sudo nginx -t
+  
+  # Restart nginx
+  sudo systemctl restart nginx
+  
+  # Verify nginx is running
+  sudo systemctl status nginx
   ```
 
 ### Directory Structure
@@ -124,78 +141,6 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
   # Add NODE_ENV to .profile for PM2 to pick up on system startup
   echo 'export NODE_ENV=production' >> ~/.profile
   source ~/.profile  # Apply to current session
-  ```
-
-### Traefik Configuration
-- [x] Set up Traefik directories and permissions
-  ```bash
-  # Create traefik system user and group
-  sudo useradd -r -s /bin/false traefik
-  
-  # Create necessary directories
-  sudo mkdir -p /etc/traefik/dynamic
-  sudo mkdir -p /var/log/traefik
-  
-  # Set proper ownership (root for config, traefik for logs)
-  sudo chown -R root:root /etc/traefik
-  sudo chown -R traefik:traefik /var/log/traefik
-  
-  # Set proper permissions
-  sudo chmod 755 /etc/traefik
-  sudo chmod 755 /etc/traefik/dynamic
-  ```
-
-- [x] Configure Traefik
-  ```bash
-  # Copy the configuration file (owned by root)
-  sudo touch /etc/traefik/traefik.yml
-  sudo chown root:root /etc/traefik/traefik.yml
-  sudo chmod 644 /etc/traefik/traefik.yml
-  sudo vim /etc/traefik/traefik.yml
-  
-  # Create empty acme.json for Let's Encrypt
-  # This needs to be writable by the traefik user for Let's Encrypt
-  # Must use 600 permissions as required by Traefik for security
-  sudo touch /etc/traefik/acme.json
-  sudo chmod 600 /etc/traefik/acme.json
-  sudo chown traefik:traefik /etc/traefik/acme.json
-  ```
-
-- [x] Create systemd service for Traefik
-  ```bash
-  sudo tee /etc/systemd/system/traefik.service << EOF
-  [Unit]
-  Description=Traefik Edge Router
-  Documentation=https://docs.traefik.io
-  After=network-online.target
-  Wants=network-online.target systemd-networkd-wait-online.service
-
-  [Service]
-  Type=simple
-  User=traefik
-  Group=traefik
-  ExecStart=/usr/local/bin/traefik --configfile=/etc/traefik/traefik.yml
-  Restart=on-failure
-  RestartSec=5
-  LimitNOFILE=1048576
-
-  [Install]
-  WantedBy=multi-user.target
-  EOF
-
-  # Reload systemd and enable Traefik
-  sudo systemctl daemon-reload
-  sudo systemctl enable traefik
-  sudo systemctl start traefik
-  ```
-
-- [ ] Verify Traefik is running
-  ```bash
-  # Check service status
-  sudo systemctl status traefik
-  
-  # Check logs
-  sudo journalctl -u traefik -f
   ```
 
 ## 4. Deployment Setup
@@ -270,8 +215,8 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
   pm2 status
   ```
 - [x] Verify application is running: `curl http://localhost:3010/` should respond with "Hola LTI!"
-- [ ] Check SSL certificate generation
-- [ ] Test domain access
+- [ ] ~~Check SSL certificate generation
+- [x] Test domain access
 
 ### Monitoring Setup
 - [ ] Set up basic monitoring
@@ -355,7 +300,7 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
 ## Required Files
 
 * .env.production (see: dotenv)
-* traefik.yml
+* nginx site configuration (see above)
 * PM2 ecosystem file
 
 ## Notes
