@@ -43,8 +43,11 @@ jobs:
           # Clone repository into release directory
           ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH/releases/$RELEASE_DIR && git clone git@github.com:${{ github.repository }}.git ."
 
-          # Install dependencies and build
-          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH/releases/$RELEASE_DIR/backend && npm ci && npm run build"
+          # Install dependencies (including dev dependencies for build)
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH/releases/$RELEASE_DIR/backend && npm ci --include=dev"
+
+          # Build
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH/releases/$RELEASE_DIR/backend && npm run build"
 
           # Copy shared files using tar (preserving permissions)
           ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH && tar cf - shared | tar xf - -C releases/$RELEASE_DIR/backend --strip-components=1"
