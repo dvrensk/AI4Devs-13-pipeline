@@ -1,0 +1,68 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.AWS_SSH_KEY }}
+
+      - name: Add host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          DEPLOY_PATH: /var/www/ats_backend
+          RELEASE_DIR: ${{ github.sha }}
+        run: |
+          # Create new release directory
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "mkdir -p $DEPLOY_PATH/releases/$RELEASE_DIR"
+
+          # Clone repository into release directory
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH/releases/$RELEASE_DIR && git clone git@github.com:${{ github.repository }}.git ."
+
+          # Install dependencies and build
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH/releases/$RELEASE_DIR/backend && npm ci && npm run build"
+
+          # Copy shared files using tar (preserving permissions)
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH && tar cf - shared | tar xf - -C releases/$RELEASE_DIR/backend --strip-components=1"
+
+          # Run database migrations
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH/releases/$RELEASE_DIR/backend && npm run prisma:migrate:deploy"
+
+          # Update current symlink
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH && rm -f current && ln -s releases/$RELEASE_DIR/backend current"
+
+          # Restart application using PM2
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH/current && pm2 reload ai4devs-backend || pm2 start dist/index.js --name ai4devs-backend"
+
+          # Save PM2 process list
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "pm2 save"
+
+          # Clean up old releases (keep last 5)
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "cd $DEPLOY_PATH/releases && ls -t | tail -n +6 | xargs -r rm -rf"
+
+          # Verify deployment
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "curl -f http://localhost:3010/ || exit 1"
