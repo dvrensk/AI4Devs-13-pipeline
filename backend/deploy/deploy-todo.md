@@ -195,10 +195,31 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
 ## 4. Deployment Setup
 
 ### GitHub Actions
-- [ ] Create GitHub repository secrets:
-  - AWS_HOST
-  - AWS_USER
-  - AWS_SSH_KEY
+- [x] Create GitHub deploy key:
+  - [x] Add to server
+    - `ssh-keygen -t ed25519 -C "GitHub deploy key" -f ~/.ssh/id_ed25519_deploykey -N ""`
+    - `cat ~/.ssh/id_ed25519_deploykey.pub`
+    - Add to `~/.ssh/config`
+      ```
+      Host github.com
+          HostName github.com
+          IdentityFile ~/.ssh/id_ed25519_deploykey
+          StrictHostKeyChecking accept-new
+      ```
+  - [x] Add to GitHub repository (Settings -> Deploy keys -> Add deploy key)
+- [x] Create server deploy key:
+    ```bash
+    ssh-keygen -t ed25519 -C "Server deploy key" -f ~/tmpkey -N ""
+    less ~/tmpkey
+    rm ~/tmpkey
+    cat ~/tmpkey.pub >> ~/.ssh/authorized_keys
+    chmod 600 ~/.ssh/authorized_keys
+    rm ~/tmpkey.pub
+    ```
+- [x] Add GitHub repository secrets:
+  - AWS_HOST = backend.ai4devs.valevalevale.es
+  - AWS_USER = ubuntu
+  - AWS_SSH_KEY = tmpkey copied from above
 
 - [ ] Create GitHub Actions workflow file:
   - [ ] Test workflow
@@ -217,7 +238,7 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
 - [ ] Clone repository
   ```bash
   cd /var/www/ats_backend/releases
-  git clone <repository-url> $(date +%Y%m%d%H%M%S)
+  git clone git@github.com:dvrensk/AI4Devs-13-pipeline.git $(date +%Y%m%d%H%M%S)
   ```
 - [ ] Set up symlinks
   ```bash
