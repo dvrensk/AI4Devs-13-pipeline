@@ -119,6 +119,12 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
   - NODE_ENV
   - PORT
   - Other required variables
+- [ ] Set NODE_ENV for PM2
+  ```bash
+  # Add NODE_ENV to .profile for PM2 to pick up on system startup
+  echo 'export NODE_ENV=production' >> ~/.profile
+  source ~/.profile  # Apply to current session
+  ```
 
 ### Traefik Configuration
 - [x] Set up Traefik directories and permissions
@@ -235,23 +241,24 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
 ## 5. Application Deployment
 
 ### First Deployment
-- [ ] Clone repository
+- [x] Clone repository
   ```bash
   cd /var/www/ats_backend/releases
   git clone git@github.com:dvrensk/AI4Devs-13-pipeline.git $(date +%Y%m%d%H%M%S)
   ```
-- [ ] Set up symlinks
+- [x] Set up symlinks and copy shared files
   ```bash
   cd /var/www/ats_backend
-  ln -s releases/$(ls -t releases | head -n1) current
+  rm -f current && ln -s releases/$(ls -rt releases | head -n1)/backend current
+  tar cf - shared | tar xf - -C current --strip-components=1
   ```
-- [ ] Install dependencies and build
+- [x] Install dependencies and build
   ```bash
   cd current
   npm ci
   npm run build
   ```
-- [ ] Start application with PM2
+- [x] Start application with PM2
   ```bash
   # Start the application
   pm2 start dist/index.js --name ai4devs-backend
@@ -262,7 +269,7 @@ The domain backend.ai4devs.valevalevale.es will be used for the backend.
   # Verify the process is running
   pm2 status
   ```
-- [ ] Verify application is running
+- [x] Verify application is running: `curl http://localhost:3010/` should respond with "Hola LTI!"
 - [ ] Check SSL certificate generation
 - [ ] Test domain access
 
